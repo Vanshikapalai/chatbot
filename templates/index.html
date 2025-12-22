@@ -90,7 +90,26 @@ async function sendMessage() {
 
     if (input.value.trim() === "") return;
 
-    // Show user message
     chat.innerHTML += `<div class="msg user"><b>You:</b> ${input.value}</div>`;
 
     const userMessage = input.value;
+    input.value = "";
+
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: userMessage })
+        });
+
+        const data = await response.json();
+        chat.innerHTML += `<div class="msg bot"><b>Bot:</b> ${data.reply}</div>`;
+    } catch (error) {
+        chat.innerHTML += `<div class="msg bot"><b>Bot:</b> Server error</div>`;
+    }
+
+    chat.scrollTop = chat.scrollHeight;
+}
+</script>
