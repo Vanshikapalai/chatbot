@@ -1,21 +1,22 @@
-import streamlit as st
+from flask import Flask, request, jsonify, render_template
 import google.generativeai as genai
+import os
 
-st.set_page_config(page_title="AI Language Agnostic Chatbot")
-st.title("🤖 AI Language Agnostic Chatbot (Gemini)")
-st.write("Ask anything in any language")
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-# Load API key
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+model = genai.GenerativeModel("gemini-1.5-flash")
 
-model = genai.GenerativeModel("gemini-pro")
+app = Flask(__name__)
 
-if "chat" not in st.session_state:
-    st.session_state.chat = model.start_chat(history=[])
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-user_input = st.text_input("Type your message")
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_msg = request.json["message"]
+    response = model.generate_content(user_msg)
+    return jsonify({"reply": response.text})
 
-if user_input:
-    with st.spinner("Thinking..."):
-        response = st.session_state.chat.send_message(user_input)
-        st.success(response.text)
+if __name__ == "__main__":
+    app.run()
