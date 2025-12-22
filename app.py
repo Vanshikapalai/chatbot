@@ -12,11 +12,18 @@ app = Flask(__name__)
 def home():
     return render_template("index.html")
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    user_msg = request.json["message"]
-    response = model.generate_content(user_msg)
-    return jsonify({"reply": response.text})
 
-if __name__ == "__main__":
-    app.run()
+    @app.route("/chat", methods=["POST"])
+def chat():
+    data = request.get_json()
+    if not data or "message" not in data:
+        return jsonify({"reply": "No message received"}), 400
+
+    user_msg = data["message"]
+
+    try:
+        response = model.generate_content(user_msg)
+        return jsonify({"reply": response.text})
+    except Exception as e:
+        return jsonify({"reply": f"Error: {str(e)}"}), 500
+
