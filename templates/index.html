@@ -1,115 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>AI Chatbot</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .chat-container {
-            width: 400px;
-            background: #020617;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        #chat {
-            height: 300px;
-            overflow-y: auto;
-            background: #020617;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #334155;
-        }
-
-        .msg {
-            margin: 8px 0;
-        }
-
-        .user {
-            color: #38bdf8;
-        }
-
-        .bot {
-            color: #a7f3d0;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: none;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background: #22c55e;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover {
-            background: #16a34a;
-        }
-    </style>
+    <title>Gemini Chatbot</title>
 </head>
 <body>
 
-<div class="chat-container">
-    <h2>🤖 Gemini AI Chatbot</h2>
-    <div id="chat"></div>
+<h2>Gemini AI Chatbot</h2>
 
-    <input type="text" id="message" placeholder="Type your message..." />
-    <button onclick="sendMessage()">Send</button>
-</div>
+<div id="chat"></div>
+
+<input id="msg" placeholder="Type message">
+<button onclick="send()">Send</button>
 
 <script>
-async function sendMessage() {
-    const input = document.getElementById("message");
-    const chat = document.getElementById("chat");
+async function send() {
+    let input = document.getElementById("msg");
+    let chat = document.getElementById("chat");
 
-    if (input.value.trim() === "") return;
-
-    chat.innerHTML += `<div class="msg user"><b>You:</b> ${input.value}</div>`;
-
-    const userMessage = input.value;
+    let text = input.value;
     input.value = "";
 
-    try {
-        const response = await fetch("/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ message: userMessage })
-        });
+    chat.innerHTML += "<p><b>You:</b> " + text + "</p>";
 
-        const data = await response.json();
-        chat.innerHTML += `<div class="msg bot"><b>Bot:</b> ${data.reply}</div>`;
-    } catch (error) {
-        chat.innerHTML += `<div class="msg bot"><b>Bot:</b> Server error</div>`;
-    }
+    const res = await fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: text})
+    });
 
-    chat.scrollTop = chat.scrollHeight;
+    const data = await res.json();
+    chat.innerHTML += "<p><b>Bot:</b> " + data.reply + "</p>";
 }
 </script>
+
+</body>
+</html>
