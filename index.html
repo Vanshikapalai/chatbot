@@ -5,20 +5,37 @@
 <title>AI College Chatbot</title>
 
 <style>
+:root {
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #000000;
+    --user: #38bdf8;
+    --bot: #e5e7eb;
+}
+
+.dark {
+    --bg: #0f172a;
+    --card: #020617;
+    --text: #ffffff;
+    --user: #22d3ee;
+    --bot: #1e293b;
+}
+
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    height: 100vh;
+    background: var(--bg);
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    transition: 0.3s;
 }
 
 .chat-container {
     width: 380px;
     height: 560px;
-    background: #ffffff;
+    background: var(--card);
     border-radius: 15px;
     display: flex;
     flex-direction: column;
@@ -26,46 +43,52 @@ body {
 }
 
 .chat-header {
-    background: #0f172a;
-    color: #38bdf8;
+    background: #2563eb;
+    color: white;
     padding: 15px;
-    text-align: center;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     border-radius: 15px 15px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.chat-sub {
-    font-size: 12px;
-    color: #cbd5f5;
+.toggle {
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .chat-box {
     flex: 1;
     padding: 15px;
     overflow-y: auto;
-    background: #f8fafc;
+    color: var(--text);
 }
 
 .message {
     max-width: 80%;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     padding: 10px 14px;
     border-radius: 12px;
-    animation: fadeIn 0.3s ease-in;
     font-size: 14px;
+    animation: fadeIn 0.3s ease-in;
 }
 
 .user {
-    background: #38bdf8;
-    color: black;
+    background: var(--user);
     margin-left: auto;
+    color: black;
 }
 
 .bot {
-    background: #e5e7eb;
-    color: black;
+    background: var(--bot);
     margin-right: auto;
+}
+
+.typing {
+    font-style: italic;
+    opacity: 0.7;
 }
 
 @keyframes fadeIn {
@@ -76,7 +99,7 @@ body {
 .chat-input {
     display: flex;
     padding: 12px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid #cbd5e1;
 }
 
 input {
@@ -100,13 +123,6 @@ button {
 button:hover {
     background: #1e40af;
 }
-
-.footer {
-    text-align: center;
-    font-size: 11px;
-    color: #64748b;
-    padding-bottom: 6px;
-}
 </style>
 </head>
 
@@ -115,7 +131,7 @@ button:hover {
 <div class="chat-container">
     <div class="chat-header">
         🤖 AI College Chatbot
-        <div class="chat-sub">CSE (IoT) • Minor Project</div>
+        <span class="toggle" onclick="toggleMode()">🌙</span>
     </div>
 
     <div class="chat-box" id="chatBox">
@@ -123,16 +139,19 @@ button:hover {
     </div>
 
     <div class="chat-input">
-        <input type="text" id="userInput" placeholder="Ask your question here..." />
+        <input type="text" id="userInput" placeholder="Ask your question..." />
         <button onclick="sendMessage()">Send</button>
-    </div>
-
-    <div class="footer">
-        Developed by CSE (IoT) – 3rd Year
     </div>
 </div>
 
 <script>
+let dark = false;
+
+function toggleMode() {
+    dark = !dark;
+    document.body.classList.toggle("dark");
+}
+
 function addMessage(text, sender) {
     const chatBox = document.getElementById("chatBox");
     const div = document.createElement("div");
@@ -150,13 +169,19 @@ async function sendMessage() {
     addMessage(text, "user");
     input.value = "";
 
-    const response = await fetch("/chat", {
+    const typing = document.createElement("div");
+    typing.className = "message bot typing";
+    typing.innerText = "Bot is typing...";
+    document.getElementById("chatBox").appendChild(typing);
+
+    const res = await fetch("/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: text})
     });
 
-    const data = await response.json();
+    const data = await res.json();
+    typing.remove();
     addMessage(data.reply, "bot");
 }
 </script>
