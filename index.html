@@ -1,42 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>AI Chatbot</title>
+    <meta charset="UTF-8">
+    <title>Gemini AI Chatbot</title>
     <style>
-        body { font-family: Arial; background:#f4f4f4; }
-        #chat { background:white; padding:10px; height:300px; overflow:auto; border:1px solid #ccc; }
-        input { width:80%; padding:10px; }
-        button { padding:10px; }
-    </style>
-</head>
-<body>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
 
-<h2>AI Based Chatbot</h2>
+        .chat-container {
+            background: #111;
+            width: 380px;
+            height: 520px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
 
-<div id="chat"></div><br>
+        .chat-header {
+            background: #1f2933;
+            color: #00e676;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 15px 15px 0 0;
+        }
 
-<input id="msg" placeholder="Ask something">
-<button onclick="send()">Send</button>
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            color: white;
+        }
 
-<script>
-async function send() {
-    let input = document.getElementById("msg");
-    let chat = document.getElementById("chat");
-    let text = input.value;
-    input.value = "";
+        .msg {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+            font-size: 14px;
+        }
 
-    chat.innerHTML += "<p><b>You:</b> " + text + "</p>";
+        .user {
+            background: #00c853;
+            color: black;
+            margin-left: auto;
+        }
 
-    let res = await fetch("/chat", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({message: text})
-    });
+        .bot {
+            background: #263238;
+            color: #eee;
+            margin-right: auto;
+        }
 
-    let data = await res.json();
-    chat.innerHTML += "<p><b>Bot:</b> " + data.reply + "</p>";
-}
-</script>
+        .chat-input {
+            display: flex;
+            padding: 12px;
+            border-top: 1px solid #333;
+        }
 
-</body>
-</html>
+        input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            margin-left
