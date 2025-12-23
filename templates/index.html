@@ -1,26 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Gemini Chatbot</title>
+<meta charset="UTF-8">
+<title>AI College Chatbot</title>
+
+<style>
+:root {
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #000000;
+    --user: #38bdf8;
+    --bot: #e5e7eb;
+}
+
+.dark {
+    --bg: #0f172a;
+    --card: #020617;
+    --text: #ffffff;
+    --user: #22d3ee;
+    --bot: #1e293b;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: 0.3s;
+}
+
+.chat-container {
+    width: 380px;
+    height: 560px;
+    background: var(--card);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.chat-header {
+    background: #2563eb;
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.chat-box {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    color: var(--text);
+}
+
+.message {
+    max-width: 80%;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.user {
+    background: var(--user);
+    margin-left: auto;
+    color: black;
+}
+
+.bot {
+    background: var(--bot);
+    margin-right: auto;
+}
+
+.typing {
+    font-style: italic;
+    opacity: 0.7;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-input {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #cbd5e1;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    outline: none;
+}
+
+button {
+    margin-left: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1e40af;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Gemini AI Chatbot</h2>
+<div class="chat-container">
+    <div class="chat-header">
+        🤖 AI College Chatbot
+        <span class="toggle" onclick="toggleMode()">🌙</span>
+    </div>
 
-<div id="chat"></div>
+    <div class="chat-box" id="chatBox">
+        <div class="message bot">Hello! I am your AI-based college assistant.</div>
+    </div>
 
-<input id="msg" placeholder="Type message">
-<button onclick="send()">Send</button>
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Ask your question..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
 
 <script>
-async function send() {
-    let input = document.getElementById("msg");
-    let chat = document.getElementById("chat");
+let dark = false;
 
-    let text = input.value;
+function toggleMode() {
+    dark = !dark;
+    document.body.classList.toggle("dark");
+}
+
+function addMessage(text, sender) {
+    const chatBox = document.getElementById("chatBox");
+    const div = document.createElement("div");
+    div.className = "message " + sender;
+    div.innerText = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendMessage() {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
     input.value = "";
 
-    chat.innerHTML += "<p><b>You:</b> " + text + "</p>";
+    const typing = document.createElement("div");
+    typing.className = "message bot typing";
+    typing.innerText = "Bot is typing...";
+    document.getElementById("chatBox").appendChild(typing);
 
     const res = await fetch("/chat", {
         method: "POST",
@@ -29,7 +181,8 @@ async function send() {
     });
 
     const data = await res.json();
-    chat.innerHTML += "<p><b>Bot:</b> " + data.reply + "</p>";
+    typing.remove();
+    addMessage(data.reply, "bot");
 }
 </script>
 
