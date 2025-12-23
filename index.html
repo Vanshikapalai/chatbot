@@ -1,35 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Chatbot</title>
+  <title>Gemini AI Chatbot</title>
 </head>
 <body>
 
 <h2>Gemini AI Chatbot</h2>
-
 <div id="chat"></div>
 
-<input id="msg" placeholder="Type message">
+<input id="msg" placeholder="Ask something">
 <button onclick="send()">Send</button>
 
 <script>
+const API_KEY = "PASTE_YOUR_NEW_GEMINI_API_KEY_HERE";
+
 async function send() {
-    const input = document.getElementById("msg");
-    const chat = document.getElementById("chat");
+  const msgInput = document.getElementById("msg");
+  const chat = document.getElementById("chat");
+  const text = msgInput.value;
+  msgInput.value = "";
 
-    const text = input.value;
-    input.value = "";
+  chat.innerHTML += `<p><b>You:</b> ${text}</p>`;
 
-    chat.innerHTML += `<p><b>You:</b> ${text}</p>`;
+  const response = await fetch(
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: text }] }]
+      })
+    }
+  );
 
-    const res = await fetch("/chat", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ message: text })
-    });
+  const data = await response.json();
+  const reply = data.candidates[0].content.parts[0].text;
 
-    const data = await res.json();
-    chat.innerHTML += `<p><b>Bot:</b> ${data.reply}</p>`;
+  chat.innerHTML += `<p><b>Bot:</b> ${reply}</p>`;
 }
 </script>
 
